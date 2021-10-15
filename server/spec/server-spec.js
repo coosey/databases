@@ -9,15 +9,15 @@ const API_URL = 'http://127.0.0.1:3000/classes';
 describe('Persistent Node Chat Server', () => {
   const dbConnection = mysql.createConnection({
     // make connections, export
-    user: 'student',
-    password: 'student',
+    user: 'root',
+    password: '',
     database: 'chat',
   });
 
   beforeAll((done) => {
     dbConnection.connect();
-
-    const tablename = 'messages'; // TODO: fill this out
+    // filled out tablename to messages
+    const tablename = 'messages';
 
     /* Empty the db table before all tests so that multiple tests
      * (or repeated runs of the tests)  will not fail when they should be passing
@@ -54,7 +54,7 @@ describe('Persistent Node Chat Server', () => {
           // Should have one result:
           expect(results.length).toEqual(1);
 
-          // TODO: If you don't have a column named text, change this test.
+          // changed results[0].text to results[0].message
           expect(results[0].message).toEqual(message);
           done();
         });
@@ -66,10 +66,13 @@ describe('Persistent Node Chat Server', () => {
 
   it('Should output all messages from the DB', (done) => {
     // Let's insert a message into the db
-    const queryString = 'SELECT * FROM messages';
-    const queryArgs = [];
-    /* TODO: The exact query string and query args to use here
-     * depend on the schema you design, so I'll leave them up to you. */
+    // added message, roomname & changed queryString to what we're trying to achieve
+    const message = 'Men like you can never change!';
+    const roomname = 'main';
+    const queryString = 'INSERT INTO messages (text, userid, roomname) VALUES (?, ?, ?)';
+    // changed queryArgs to what we want
+    const queryArgs = [message, 1, roomname];
+
     dbConnection.query(queryString, queryArgs, (err) => {
       if (err) {
         throw err;
@@ -79,6 +82,7 @@ describe('Persistent Node Chat Server', () => {
       axios.get(`${API_URL}/messages`)
         .then((response) => {
           const messageLog = response.data;
+          // changed messageLog[0].text to messageLog[0].message
           expect(messageLog[0].message).toEqual(message);
           expect(messageLog[0].roomname).toEqual(roomname);
           done();
